@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save } from 'lucide-react';
 import ImageUpload from './components/ImageUpload';
+import { API_BASE_URL, API_V1_URL } from '../../config';
 
 const AdminNosotros = () => {
     const [team, setTeam] = useState<any[]>([]);
@@ -17,7 +18,7 @@ const AdminNosotros = () => {
     ];
 
     const fetchTeam = () => {
-        fetch('http://localhost:8001/api/v1/team/')
+        fetch(`${API_V1_URL}/team/`)
             .then(res => res.json())
             .then(data => setTeam(data));
     };
@@ -30,7 +31,7 @@ const AdminNosotros = () => {
 
     const handleDelete = async (id: number) => {
         if (!confirm('¿Seguro que quieres eliminar a este miembro del equipo?')) return;
-        await fetch(`http://localhost:8001/api/v1/team/${id}`, {
+        await fetch(`${API_V1_URL}/team/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -57,7 +58,7 @@ const AdminNosotros = () => {
             social_links: social_links
         };
 
-        const url = isEditing.id ? `http://localhost:8001/api/v1/team/${isEditing.id}` : 'http://localhost:8001/api/v1/team/';
+        const url = isEditing.id ? `${API_V1_URL}/team/${isEditing.id}` : `${API_V1_URL}/team/`;
         const method = isEditing.id ? 'PUT' : 'POST';
 
         try {
@@ -107,7 +108,7 @@ const AdminNosotros = () => {
                     <tbody>
                         {team.map(m => (
                             <tr key={m.id}>
-                                <td><img src={m.image_url} width="40" height="40" style={{ borderRadius: '50%', objectFit: 'cover' }} alt="" /></td>
+                                <td><img src={m.image_url?.startsWith('http') ? m.image_url : `${API_BASE_URL}${m.image_url}`} width="40" height="40" style={{ borderRadius: '50%', objectFit: 'cover' }} alt="" /></td>
                                 <td>{m.name}</td>
                                 <td>
                                     <div style={{ display: 'flex', gap: '5px' }}>

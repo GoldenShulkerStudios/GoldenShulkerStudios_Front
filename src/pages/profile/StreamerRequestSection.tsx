@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_V1_URL } from '../../config';
 
 const StreamerRequestSection = ({ token }: { token: string }) => {
     const [streamerName, setStreamerName] = useState('');
@@ -8,7 +9,7 @@ const StreamerRequestSection = ({ token }: { token: string }) => {
     const [msg, setMsg] = useState('');
 
     useEffect(() => {
-        fetch('http://localhost:8001/api/v1/streamer-requests/me', {
+        fetch(`${API_V1_URL}/streamer-requests/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())
@@ -32,7 +33,7 @@ const StreamerRequestSection = ({ token }: { token: string }) => {
         setMsg('');
 
         try {
-            const res = await fetch('http://localhost:8001/api/v1/streamer-requests/', {
+            const res = await fetch(`${API_V1_URL}/streamer-requests/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

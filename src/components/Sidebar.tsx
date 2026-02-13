@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
+import { API_V1_URL } from '../config';
 import { PanelLeftClose, PanelLeftOpen, Home, FolderOpen, LogIn, Users, UserCircle, Layout, FolderCog, Users2, Settings, Instagram, Twitter, Camera } from 'lucide-react';
 
 interface SidebarProps {
@@ -17,7 +18,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
     const fetchUser = () => {
         const currentToken = localStorage.getItem('token');
         if (currentToken) {
-            fetch('http://localhost:8001/api/v1/me', {
+            fetch(`${API_V1_URL}/me`, {
                 headers: {
                     'Authorization': `Bearer ${currentToken}`
                 }
@@ -40,7 +41,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
     };
 
     const fetchPendingCount = (token: string) => {
-        fetch('http://localhost:8001/api/v1/utils/pending-counts', {
+        fetch(`${API_V1_URL}/utils/pending-counts`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { API_V1_URL } from '../config';
+
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -18,7 +20,7 @@ const Login = () => {
             formData.append('username', email); // backend uses 'username' for OAuth2 but it's the email
             formData.append('password', password);
 
-            const response = await fetch('http://localhost:8001/api/v1/login', {
+            const response = await fetch(`${API_V1_URL}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

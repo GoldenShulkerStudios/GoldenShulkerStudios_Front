@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { formatDateProfile } from './utils';
+import { API_V1_URL } from '../../config';
 
 const MyProjectsSection = ({ token }: { token: string }) => {
     const [applications, setApplications] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://localhost:8001/api/v1/applications/me', {
+        fetch(`${API_V1_URL}/applications/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())
@@ -31,7 +32,7 @@ const MyProjectsSection = ({ token }: { token: string }) => {
         if (!confirm('¿Estás seguro de que deseas abandonar este proyecto?')) return;
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8001/api/v1/applications/${applicationId}`, {
+            const res = await fetch(`${API_V1_URL}/applications/${applicationId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

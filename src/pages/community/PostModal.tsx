@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowBigUp, ArrowBigDown, Send, ExternalLink, X } from 'lucide-react';
 import type { Post } from './types';
 
-const API_BASE = 'http://localhost:8001';
+import { API_BASE_URL, API_V1_URL } from '../../config';
 
 const PostModal = ({ post, token, onClose, onRefresh }: { post: Post, token: string | null, onClose: () => void, onRefresh: () => void }) => {
     const [commentText, setCommentText] = useState('');
@@ -11,8 +11,8 @@ const PostModal = ({ post, token, onClose, onRefresh }: { post: Post, token: str
     const handleVote = async (target: 'post' | 'comment', id: number, voteType: number) => {
         if (!token) return alert('Inicia sesión para votar');
         const url = target === 'post'
-            ? `${API_BASE}/api/v1/posts/${id}/vote`
-            : `${API_BASE}/api/v1/posts/${post.id}/comments/${id}/vote`;
+            ? `${API_V1_URL}/posts/${id}/vote`
+            : `${API_V1_URL}/posts/${post.id}/comments/${id}/vote`;
 
         try {
             await fetch(url, {
@@ -34,7 +34,7 @@ const PostModal = ({ post, token, onClose, onRefresh }: { post: Post, token: str
         if (!commentText.trim() || !token) return;
         setSubmitting(true);
         try {
-            const res = await fetch(`${API_BASE}/api/v1/posts/${post.id}/comments`, {
+            const res = await fetch(`${API_V1_URL}/posts/${post.id}/comments`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ const PostModal = ({ post, token, onClose, onRefresh }: { post: Post, token: str
 
     const getMediaUrl = (url?: string) => {
         if (!url) return '';
-        return url.startsWith('http') ? url : `${API_BASE}${url}`;
+        return url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
     };
 
     return (

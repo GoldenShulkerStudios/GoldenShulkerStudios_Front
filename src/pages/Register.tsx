@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { API_V1_URL } from '../config';
+
 const Register = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -22,7 +24,7 @@ const Register = () => {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8001/api/v1/register', {
+            const response = await fetch(`${API_V1_URL}/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

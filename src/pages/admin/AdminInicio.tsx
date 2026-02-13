@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { GripVertical, Plus, Edit2, Trash2, Save } from 'lucide-react';
 import ImageUpload from './components/ImageUpload';
+import { API_BASE_URL, API_V1_URL } from '../../config';
 
 const AdminInicio = () => {
     const [banners, setBanners] = useState<any[]>([]);
@@ -21,7 +22,7 @@ const AdminInicio = () => {
     const [externalUrl, setExternalUrl] = useState('');
 
     const fetchBanners = () => {
-        fetch('http://localhost:8001/api/v1/banner/')
+        fetch(`${API_V1_URL}/banner/`)
             .then(res => res.json())
             .then(data => {
                 const sorted = data.sort((a: any, b: any) => a.order - b.order);
@@ -47,7 +48,7 @@ const AdminInicio = () => {
 
     const handleDelete = async (id: number) => {
         if (!confirm('¿Seguro que quieres eliminar este banner?')) return;
-        await fetch(`http://localhost:8001/api/v1/banner/${id}`, {
+        await fetch(`${API_V1_URL}/banner/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -68,7 +69,7 @@ const AdminInicio = () => {
         const updates = items.map((item, index) => {
             const newOrder = index + 1;
             if (item.order !== newOrder) {
-                return fetch(`http://localhost:8001/api/v1/banner/${item.id}`, {
+                return fetch(`${API_V1_URL}/banner/${item.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ const AdminInicio = () => {
             button_link: selectedRoute === 'external' ? externalUrl : selectedRoute
         };
 
-        const url = isEditing.id ? `http://localhost:8001/api/v1/banner/${isEditing.id}` : 'http://localhost:8001/api/v1/banner/';
+        const url = isEditing.id ? `${API_V1_URL}/banner/${isEditing.id}` : `${API_V1_URL}/banner/`;
         const method = isEditing.id ? 'PUT' : 'POST';
 
         // If new, set order to max + 1
@@ -161,7 +162,7 @@ const AdminInicio = () => {
                                                     <td {...provided.dragHandleProps} style={{ cursor: 'grab' }}>
                                                         <GripVertical size={18} style={{ opacity: 0.4 }} />
                                                     </td>
-                                                    <td><img src={b.image_url} width="100" style={{ borderRadius: '4px' }} alt="" /></td>
+                                                    <td><img src={b.image_url?.startsWith('http') ? b.image_url : `${API_BASE_URL}${b.image_url}`} width="100" style={{ borderRadius: '4px' }} alt="" /></td>
                                                     <td>{b.title}</td>
                                                     <td><code style={{ color: 'var(--primary-yellow)' }}>{b.button_link}</code></td>
                                                     <td>

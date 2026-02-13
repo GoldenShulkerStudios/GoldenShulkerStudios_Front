@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Folder, X } from 'lucide-react';
+import { API_V1_URL } from '../../config';
 
 const AdminConfig = () => {
     const [applications, setApplications] = useState<any[]>([]);
@@ -10,8 +11,8 @@ const AdminConfig = () => {
     const fetchData = () => {
         setLoading(true);
         Promise.all([
-            fetch('http://localhost:8001/api/v1/applications/', { headers: { 'Authorization': `Bearer ${token}` } }).then(res => res.json()),
-            fetch('http://localhost:8001/api/v1/streamer-requests/', { headers: { 'Authorization': `Bearer ${token}` } }).then(res => res.json())
+            fetch(`${API_V1_URL}/applications/`, { headers: { 'Authorization': `Bearer ${token}` } }).then(res => res.json()),
+            fetch(`${API_V1_URL}/streamer-requests/`, { headers: { 'Authorization': `Bearer ${token}` } }).then(res => res.json())
         ])
             .then(([appData, streamerData]) => {
                 if (Array.isArray(appData)) {
@@ -34,7 +35,7 @@ const AdminConfig = () => {
 
     const handleAppStatus = async (id: number, status: string) => {
         try {
-            const res = await fetch(`http://localhost:8001/api/v1/applications/${id}`, {
+            const res = await fetch(`${API_V1_URL}/applications/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ status })
@@ -48,7 +49,7 @@ const AdminConfig = () => {
     const handleAppDelete = async (id: number) => {
         if (!confirm('¿Eliminar esta inscripción del proyecto?')) return;
         try {
-            const res = await fetch(`http://localhost:8001/api/v1/applications/${id}`, {
+            const res = await fetch(`${API_V1_URL}/applications/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -60,7 +61,7 @@ const AdminConfig = () => {
 
     const handleStreamerStatus = async (id: number, status: string) => {
         try {
-            const res = await fetch(`http://localhost:8001/api/v1/streamer-requests/${id}`, {
+            const res = await fetch(`${API_V1_URL}/streamer-requests/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ status })

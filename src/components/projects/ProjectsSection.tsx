@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import type { Project } from './types';
 import ProjectCard from './ProjectCard';
+import { API_BASE_URL, API_V1_URL } from '../../config';
 import ProjectDetail from './ProjectDetail';
 import ApplicationModal from './ApplicationModal';
 import UpcomingReel from './UpcomingReel';
@@ -32,13 +33,13 @@ const ProjectsSection = () => {
 
     const fetchProjects = async () => {
         try {
-            const res = await fetch('http://localhost:8001/api/v1/projects/');
+            const res = await fetch(`${API_V1_URL}/projects/`);
             const data = await res.json();
             if (Array.isArray(data)) {
                 // Map API "image_url" to component "image"
                 const mapped = data.map((p: any) => ({
                     ...p,
-                    image: p.image_url ? (p.image_url.startsWith('http') ? p.image_url : `http://localhost:8001${p.image_url}`) : 'https://via.placeholder.com/400x200',
+                    image: p.image_url ? (p.image_url.startsWith('http') ? p.image_url : `${API_BASE_URL}${p.image_url}`) : 'https://via.placeholder.com/400x200',
                     subtitle: p.tagline,
                     cliente: p.client,
                     duracion: p.duration,
@@ -57,8 +58,8 @@ const ProjectsSection = () => {
         if (!token) return;
         try {
             const [resApps, resMe] = await Promise.all([
-                fetch('http://localhost:8001/api/v1/applications/me', { headers: { 'Authorization': `Bearer ${token}` } }),
-                fetch('http://localhost:8001/api/v1/me', { headers: { 'Authorization': `Bearer ${token}` } })
+                fetch(`${API_V1_URL}/applications/me`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                fetch(`${API_V1_URL}/me`, { headers: { 'Authorization': `Bearer ${token}` } })
             ]);
             const apps = await resApps.json();
             const me = await resMe.json();
@@ -96,7 +97,7 @@ const ProjectsSection = () => {
         if (!selectedProject || !token) return;
         setApplyingLoading(true);
         try {
-            const res = await fetch('http://localhost:8001/api/v1/applications/', {
+            const res = await fetch(`${API_V1_URL}/applications/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

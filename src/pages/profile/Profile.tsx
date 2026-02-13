@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MyProjectsSection from './MyProjectsSection';
 import StreamerRequestSection from './StreamerRequestSection';
+import { API_V1_URL } from '../../config';
 
 const Profile = () => {
     const [activeTab, setActiveTab] = useState('Mis datos');
@@ -25,7 +26,7 @@ const Profile = () => {
     const navigate = useNavigate();
 
     const fetchUserData = () => {
-        fetch('http://localhost:8001/api/v1/me', {
+        fetch(`${API_V1_URL}/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -64,7 +65,7 @@ const Profile = () => {
 
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:8001/api/v1/update', {
+            const response = await fetch(`${API_V1_URL}/update`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

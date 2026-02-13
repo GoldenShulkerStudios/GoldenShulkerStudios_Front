@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Twitter, Facebook, Instagram, Github, Youtube, Twitch } from 'lucide-react';
+import { API_BASE_URL, API_V1_URL } from '../config';
 
 export interface TeamMember {
     id: number;
@@ -45,14 +46,14 @@ const AboutUs = () => {
 
     useEffect(() => {
         // Fetch Team Members
-        fetch('http://localhost:8001/api/v1/team/')
+        fetch(`${API_V1_URL}/team/`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
                     setTeamMembers(data.map((m: any) => ({
                         id: m.id,
                         name: m.name,
-                        image: m.image_url,
+                        image: m.image_url?.startsWith('http') ? m.image_url : `${API_BASE_URL}${m.image_url}`,
                         socials: m.social_links.map((s: any) => ({
                             platform: s.platform.toLowerCase(),
                             url: s.url
@@ -63,14 +64,14 @@ const AboutUs = () => {
             .catch(err => console.error(err));
 
         // Fetch Streamers
-        fetch('http://localhost:8001/api/v1/streamers/')
+        fetch(`${API_V1_URL}/streamers/`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
                     setStreamers(data.map((s: any) => ({
                         id: s.id,
                         name: s.name,
-                        image: s.image_url,
+                        image: s.image_url?.startsWith('http') ? s.image_url : `${API_BASE_URL}${s.image_url}`,
                         url: s.channel_url,
                         isLive: s.is_live
                     })));

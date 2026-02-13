@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, Star, X, Users } from 'lucide-react';
 import ImageUpload from './components/ImageUpload';
+import { API_V1_URL } from '../../config';
 
 const AdminProyectos = () => {
     const [projects, setProjects] = useState<any[]>([]);
@@ -14,7 +15,7 @@ const AdminProyectos = () => {
     const token = localStorage.getItem('token');
 
     const fetchProjects = () => {
-        fetch('http://localhost:8001/api/v1/projects/')
+        fetch(`${API_V1_URL}/projects/`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -35,7 +36,7 @@ const AdminProyectos = () => {
 
     const fetchParticipants = (projectId: number) => {
         setLoadingParticipants(true);
-        fetch(`http://localhost:8001/api/v1/applications/project/${projectId}`, {
+        fetch(`${API_V1_URL}/applications/project/${projectId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())
@@ -66,7 +67,7 @@ const AdminProyectos = () => {
             catch { payload.adds = payload.adds.split(',').map((s: any) => s.trim()); }
         }
 
-        await fetch(`http://localhost:8001/api/v1/projects/${project.id}`, {
+        await fetch(`${API_V1_URL}/projects/${project.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -82,7 +83,7 @@ const AdminProyectos = () => {
 
         try {
             // Check if there are applications
-            const res = await fetch(`http://localhost:8001/api/v1/applications/project/${id}`, {
+            const res = await fetch(`${API_V1_URL}/applications/project/${id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const apps = await res.json();
@@ -90,7 +91,7 @@ const AdminProyectos = () => {
             if (Array.isArray(apps) && apps.length > 0) {
                 if (confirm(`Este proyecto tiene ${apps.length} solicitudes/participantes. ¿Deseas eliminar a todos los participantes para poder eliminar el proyecto?`)) {
                     // Delete all participants
-                    await fetch(`http://localhost:8001/api/v1/applications/project/${id}`, {
+                    await fetch(`${API_V1_URL}/applications/project/${id}`, {
                         method: 'DELETE',
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
@@ -100,7 +101,7 @@ const AdminProyectos = () => {
             }
 
             // Finally delete the project
-            await fetch(`http://localhost:8001/api/v1/projects/${id}`, {
+            await fetch(`${API_V1_URL}/projects/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -115,7 +116,7 @@ const AdminProyectos = () => {
         if (!confirm('¿Seguro que quieres quitar a este participante de este proyecto?')) return;
 
         try {
-            await fetch(`http://localhost:8001/api/v1/applications/${appId}`, {
+            await fetch(`${API_V1_URL}/applications/${appId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -145,7 +146,7 @@ const AdminProyectos = () => {
             end_date: rawData.end_date || null
         };
 
-        const url = isEditing.id ? `http://localhost:8001/api/v1/projects/${isEditing.id}` : 'http://localhost:8001/api/v1/projects/';
+        const url = isEditing.id ? `${API_V1_URL}/projects/${isEditing.id}` : `${API_V1_URL}/projects/`;
         const method = isEditing.id ? 'PUT' : 'POST';
 
         try {

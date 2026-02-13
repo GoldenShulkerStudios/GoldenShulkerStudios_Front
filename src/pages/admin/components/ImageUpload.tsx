@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { API_BASE_URL, API_V1_URL } from '../../../config';
 
 const ImageUpload = ({ value, onChange, label }: { value: string, onChange: (url: string) => void, label: string }) => {
     const [uploading, setUploading] = useState(false);
@@ -13,7 +14,7 @@ const ImageUpload = ({ value, onChange, label }: { value: string, onChange: (url
         formData.append('file', file);
 
         try {
-            const response = await fetch('http://localhost:8001/api/v1/utils/upload-media', {
+            const response = await fetch(`${API_V1_URL}/utils/upload-media`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -24,7 +25,7 @@ const ImageUpload = ({ value, onChange, label }: { value: string, onChange: (url
                 throw new Error(errorData.detail || 'Error subiendo imagen');
             }
             const data = await response.json();
-            onChange(`http://localhost:8001${data.url}`);
+            onChange(`${API_BASE_URL}${data.url}`);
         } catch (err: any) {
             alert(err.message || 'Error al subir la imagen');
             console.error(err);
@@ -37,7 +38,7 @@ const ImageUpload = ({ value, onChange, label }: { value: string, onChange: (url
         <div className="admin-form-group">
             <label>{label}</label>
             <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-                {value && <img src={value} alt="Preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />}
+                {value && <img src={value.startsWith('http') ? value : `${API_BASE_URL}${value}`} alt="Preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />}
                 <div style={{ flex: 1, position: 'relative' }}>
                     <input
                         type="file"

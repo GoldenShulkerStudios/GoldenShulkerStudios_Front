@@ -2,7 +2,7 @@ import React from 'react';
 import { MessageSquare, ArrowBigUp, ArrowBigDown, Trash2, Play } from 'lucide-react';
 import type { Post } from './types';
 
-const API_BASE = 'http://localhost:8001';
+import { API_BASE_URL, API_V1_URL } from '../../config';
 
 const PostCard = ({ post, user, token, onClick, onRefresh }: { post: Post, user: any, token: string | null, onClick: () => void, onRefresh: () => void }) => {
 
@@ -10,7 +10,7 @@ const PostCard = ({ post, user, token, onClick, onRefresh }: { post: Post, user:
         e.stopPropagation();
         if (!token) return alert('Inicia sesión para votar');
         try {
-            await fetch(`${API_BASE}/api/v1/posts/${post.id}/vote`, {
+            await fetch(`${API_V1_URL}/posts/${post.id}/vote`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ const PostCard = ({ post, user, token, onClick, onRefresh }: { post: Post, user:
         e.stopPropagation();
         if (!confirm('¿Eliminar esta publicación?')) return;
         try {
-            const res = await fetch(`${API_BASE}/api/v1/posts/${post.id}`, {
+            const res = await fetch(`${API_V1_URL}/posts/${post.id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -40,7 +40,7 @@ const PostCard = ({ post, user, token, onClick, onRefresh }: { post: Post, user:
 
     const getImageUrl = (url?: string) => {
         if (!url) return '';
-        return url.startsWith('http') ? url : `${API_BASE}${url}`;
+        return url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
     };
 
     return (

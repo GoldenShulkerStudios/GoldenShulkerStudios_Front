@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL, API_V1_URL } from '../config';
 
 // Banner slide data structure ready for Admin Panel integration
 export interface BannerSlide {
@@ -21,7 +22,7 @@ const Banner = () => {
     const [direction, setDirection] = useState(0);
 
     useEffect(() => {
-        fetch('http://localhost:8001/api/v1/banner/')
+        fetch(`${API_V1_URL}/banner/`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
@@ -33,7 +34,7 @@ const Banner = () => {
                         description: b.description,
                         buttonText: b.button_text,
                         buttonLink: b.button_link,
-                        image: b.image_url
+                        image: b.image_url?.startsWith('http') ? b.image_url : `${API_BASE_URL}${b.image_url}`
                     }));
                     setSlides(formattedSlides);
                 }

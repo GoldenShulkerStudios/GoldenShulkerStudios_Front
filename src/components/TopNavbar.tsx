@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User } from 'lucide-react';
+import { API_V1_URL } from '../config';
 
 const TopNavbar = () => {
     const [user, setUser] = useState<{ username: string, role: string } | null>(null);
@@ -7,7 +8,7 @@ const TopNavbar = () => {
     const fetchUser = () => {
         const currentToken = localStorage.getItem('token');
         if (currentToken) {
-            fetch('http://localhost:8001/api/v1/me', {
+            fetch(`${API_V1_URL}/me`, {
                 headers: {
                     'Authorization': `Bearer ${currentToken}`
                 }
