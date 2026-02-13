@@ -9,20 +9,20 @@ import Footer from './components/Footer';
 // Lazy load components
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
-const Profile = lazy(() => import('./pages/Profile'));
+const Profile = lazy(() => import('./pages/profile/Profile'));
 
 // Admin Components
-const AdminInicio = lazy(() => import('./pages/admin/AdminPages').then(module => ({ default: module.AdminInicio })));
-const AdminProyectos = lazy(() => import('./pages/admin/AdminPages').then(module => ({ default: module.AdminProyectos })));
-const AdminNosotros = lazy(() => import('./pages/admin/AdminPages').then(module => ({ default: module.AdminNosotros })));
-const AdminConfig = lazy(() => import('./pages/admin/AdminPages').then(module => ({ default: module.AdminConfig })));
+const AdminInicio = lazy(() => import('./pages/admin/AdminInicio'));
+const AdminProyectos = lazy(() => import('./pages/admin/AdminProyectos'));
+const AdminNosotros = lazy(() => import('./pages/admin/AdminNosotros'));
+const AdminConfig = lazy(() => import('./pages/admin/AdminConfig'));
 
 // Main Sections
 const Banner = lazy(() => import('./components/Banner'));
 const Services = lazy(() => import('./components/Services'));
-const ProjectsSection = lazy(() => import('./components/ProjectsSection'));
+const ProjectsSection = lazy(() => import('./components/projects/ProjectsSection'));
 const AboutUs = lazy(() => import('./components/AboutUs'));
-const Community = lazy(() => import('./pages/Community'));
+const Community = lazy(() => import('./pages/community/Community'));
 
 
 const Layout = () => {
