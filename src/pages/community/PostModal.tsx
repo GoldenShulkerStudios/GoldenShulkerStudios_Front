@@ -3,13 +3,14 @@ import { ArrowBigUp, ArrowBigDown, Send, ExternalLink, X } from 'lucide-react';
 import type { Post } from './types';
 
 import { API_BASE_URL, API_V1_URL } from '../../config';
+import { validateCommunityAction } from '../../validations/communityValidation';
 
 const PostModal = ({ post, token, onClose, onRefresh }: { post: Post, token: string | null, onClose: () => void, onRefresh: () => void }) => {
     const [commentText, setCommentText] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
     const handleVote = async (target: 'post' | 'comment', id: number, voteType: number) => {
-        if (!token) return alert('Inicia sesión para votar');
+        if (!validateCommunityAction(token)) return;
         const url = target === 'post'
             ? `${API_V1_URL}/posts/${id}/vote`
             : `${API_V1_URL}/posts/${post.id}/comments/${id}/vote`;
@@ -133,8 +134,8 @@ const PostModal = ({ post, token, onClose, onRefresh }: { post: Post, token: str
                     }}>
                         <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                                <span style={{ fontWeight: 800, color: 'white' }}>{post.user.username}</span>
-                                <span style={{ fontSize: '0.7rem', color: 'var(--primary-yellow)', border: '1px solid rgba(236,199,46,0.2)', padding: '2px 8px', borderRadius: '4px' }}>{post.user.role}</span>
+                                <span style={{ fontWeight: 800, color: 'white' }}>{post.user?.username || 'Usuario'}</span>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--primary-yellow)', border: '1px solid rgba(236,199,46,0.2)', padding: '2px 8px', borderRadius: '4px' }}>{post.user?.role || 'User'}</span>
                             </div>
                             <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{post.content}</p>
 
@@ -156,7 +157,7 @@ const PostModal = ({ post, token, onClose, onRefresh }: { post: Post, token: str
                                     <div key={comment.id} style={{ marginBottom: '20px', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '12px' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                <span style={{ fontWeight: 700, color: 'var(--primary-yellow)', fontSize: '0.9rem' }}>{comment.user.username}</span>
+                                                <span style={{ fontWeight: 700, color: 'var(--primary-yellow)', fontSize: '0.9rem' }}>{comment.user?.username || 'Usuario'}</span>
                                                 <span style={{ opacity: 0.3, fontSize: '0.75rem' }}>{new Date(comment.created_at).toLocaleDateString()}</span>
                                             </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>

@@ -21,6 +21,7 @@ const Profile = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
+    const [notifications, setNotifications] = useState<any[]>([]);
 
     const token = localStorage.getItem('token');
     const navigate = useNavigate();
@@ -42,7 +43,77 @@ const Profile = () => {
                     setDiscordId(data.discord_id || '');
                 }
             })
-            .catch(err => console.error("Error fetching user data:", err));
+    };
+
+    const fetchNotifications = async () => {
+        try {
+            const [appsRes, streamerRes] = await Promise.all([
+                fetch(`${API_V1_URL}/applications/me`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                fetch(`${API_V1_URL}/streamer-requests/me`, { headers: { 'Authorization': `Bearer ${token}` } })
+            ]);
+
+            const appsData = await appsRes.json();
+            const streamerData = await streamerRes.json();
+
+            interface Notification {
+                id: string;
+                type: string;
+                text: string;
+                targetTab: string;
+            }
+
+            const newNotifications: Notification[] = [];
+            const dismissedNotifs = JSON.parse(localStorage.getItem('dismissedNotifications') || '[]');
+
+            if (Array.isArray(appsData)) {
+                const importantApps = appsData.filter(app => app.status === 'Aceptada' || app.status === 'Revocada');
+                importantApps.forEach(app => {
+                    const id = `app-${app.id}-${app.status}`;
+                    if (!dismissedNotifs.includes(id)) {
+                        const isRevoked = app.status === 'Revocada';
+                        newNotifications.push({
+                            id,
+                            type: 'project',
+                            text: isRevoked
+                                ? `Tu inscripción para "${app.project?.title}" ha sido revocada. Habla con el staff para info.`
+                                : `¡Tu solicitud para "${app.project?.title}" ha sido aceptada!`,
+                            targetTab: 'Proyectos participados'
+                        });
+                    }
+                });
+            }
+
+            if (Array.isArray(streamerData)) {
+                const importantStreamers = streamerData.filter(req => req.status === 'Aceptada' || req.status === 'Revocada');
+                importantStreamers.forEach(req => {
+                    const id = `streamer-${req.id}-${req.status}`;
+                    if (!dismissedNotifs.includes(id)) {
+                        const isRevoked = req.status === 'Revocada';
+                        newNotifications.push({
+                            id,
+                            type: 'streamer',
+                            text: isRevoked
+                                ? `Tu rango de Streamer ha sido revocado. Habla con el staff para info.`
+                                : `¡Tu solicitud de Streamer ha sido aceptada!`,
+                            targetTab: 'Configuración / Conexiones'
+                        });
+                    }
+                });
+            }
+
+            setNotifications(newNotifications);
+        } catch (err) {
+            console.error("Error fetching notifications:", err);
+        }
+    };
+
+    const dismissNotification = (id: string) => {
+        const dismissedNotifs = JSON.parse(localStorage.getItem('dismissedNotifications') || '[]');
+        if (!dismissedNotifs.includes(id)) {
+            dismissedNotifs.push(id);
+            localStorage.setItem('dismissedNotifications', JSON.stringify(dismissedNotifs));
+        }
+        setNotifications(prev => prev.filter(n => n.id !== id));
     };
 
     useEffect(() => {
@@ -51,6 +122,7 @@ const Profile = () => {
             return;
         }
         fetchUserData();
+        fetchNotifications();
     }, [token, navigate]);
 
     const handleUpdate = async (e: React.FormEvent) => {
@@ -112,18 +184,86 @@ const Profile = () => {
             </header>
 
             <div className="filters-wrapper">
-                {tabs.map(tab => (
-                    <button
-                        key={tab}
-                        className={`filter-btn ${activeTab === tab ? 'active' : ''}`}
-                        onClick={() => setActiveTab(tab)}
-                    >
-                        {tab}
-                    </button>
-                ))}
+                {tabs.map(tab => {
+                    const hasNotif = notifications.some(n => n.targetTab === tab);
+                    return (
+                        <button
+                            key={tab}
+                            className={`filter-btn ${activeTab === tab ? 'active' : ''}`}
+                            onClick={() => {
+                                setActiveTab(tab);
+                                // Dismiss all notifications for this tab when clicked
+                                notifications.filter(n => n.targetTab === tab).forEach(n => dismissNotification(n.id));
+                            }}
+                            style={{ position: 'relative' }}
+                        >
+                            {tab}
+                            {hasNotif && (
+                                <span style={{
+                                    position: 'absolute',
+                                    top: '-5px',
+                                    right: '-5px',
+                                    width: '10px',
+                                    height: '10px',
+                                    background: 'var(--primary-yellow)',
+                                    borderRadius: '50%',
+                                    boxShadow: '0 0 10px var(--primary-yellow)'
+                                }}></span>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
 
             <div className="profile-content-card">
+                {notifications.length > 0 && activeTab === 'Mis datos' && (
+                    <div className="notifications-container" style={{ marginBottom: '20px' }}>
+                        {notifications.map(n => (
+                            <div
+                                key={n.id}
+                                onClick={() => {
+                                    setActiveTab(n.targetTab);
+                                    dismissNotification(n.id);
+                                }}
+                                style={{
+                                    background: 'rgba(236, 199, 46, 0.1)',
+                                    border: '1px solid var(--primary-yellow)',
+                                    padding: '12px 20px',
+                                    borderRadius: '8px',
+                                    marginBottom: '10px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    animation: 'pulse 2s infinite'
+                                }}
+                            >
+                                <span style={{ color: 'var(--primary-yellow)', fontWeight: 'bold' }}>{n.text}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                    <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Ver más →</span>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            dismissNotification(n.id);
+                                        }}
+                                        style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            color: 'white',
+                                            cursor: 'pointer',
+                                            fontSize: '1.2rem',
+                                            opacity: 0.5,
+                                            padding: '5px'
+                                        }}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 {error && <div className="error-message">{error}</div>}
                 {success && <div className="success-message">{success}</div>}
 

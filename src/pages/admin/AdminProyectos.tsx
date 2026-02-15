@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, Star, X, Users } from 'lucide-react';
 import ImageUpload from './components/ImageUpload';
 import { API_V1_URL } from '../../config';
+import { validateAdminAction } from '../../validations/adminValidation';
 
 const AdminProyectos = () => {
     const [projects, setProjects] = useState<any[]>([]);
@@ -12,6 +13,7 @@ const AdminProyectos = () => {
     const [projectParticipants, setProjectParticipants] = useState<any[]>([]);
     const [loadingParticipants, setLoadingParticipants] = useState(false);
     const PROJECTS_PER_PAGE = 8;
+    const [user, setUser] = useState<any>(null);
     const token = localStorage.getItem('token');
 
     const fetchProjects = () => {
@@ -19,15 +21,15 @@ const AdminProyectos = () => {
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
-                    // Sort: is_featured first, then start_date descending (newest first)
+                    // Sort: is_featured first, then start_date descending (newest first), then id descending
                     const sorted = data.sort((a: any, b: any) => {
                         if (a.is_featured && !b.is_featured) return -1;
                         if (!a.is_featured && b.is_featured) return 1;
 
-                        // If equal featured status, sort by date
                         const dateA = a.start_date ? new Date(a.start_date).getTime() : 0;
                         const dateB = b.start_date ? new Date(b.start_date).getTime() : 0;
-                        return dateB - dateA;
+                        if (dateB !== dateA) return dateB - dateA;
+                        return b.id - a.id;
                     });
                     setProjects(sorted);
                 }
@@ -49,7 +51,14 @@ const AdminProyectos = () => {
             .finally(() => setLoadingParticipants(false));
     };
 
-    useEffect(() => { fetchProjects(); }, []);
+    useEffect(() => {
+        if (token) {
+            fetch(`${API_V1_URL}/me`, { headers: { 'Authorization': `Bearer ${token}` } })
+                .then(res => res.json())
+                .then(data => setUser(data));
+        }
+        fetchProjects();
+    }, [token]);
 
     // Pagination Logic
     const totalPages = Math.ceil(projects.length / PROJECTS_PER_PAGE);
@@ -128,6 +137,7 @@ const AdminProyectos = () => {
 
     const handleSave = async (e: any) => {
         e.preventDefault();
+        if (!validateAdminAction(user, token)) return;
         const formData = new FormData(e.target);
         const rawData: any = Object.fromEntries(formData);
 

@@ -33,7 +33,7 @@ const ProjectDetail = ({
                 <h3 className="detail-title">{selectedProject.title}</h3>
 
                 <div className="detail-meta">
-                    <div className="meta-item">
+                    <div className="meta-item full-width">
                         <span className="meta-label">Estado</span>
                         <span className={getStatusClass(selectedProject.status)}>{selectedProject.status}</span>
                     </div>
@@ -45,24 +45,19 @@ const ProjectDetail = ({
                         <span className="meta-label">Duración</span>
                         <span className="meta-value">{selectedProject.duracion}</span>
                     </div>
+                    {selectedProject.start_date && (
+                        <div className="meta-item">
+                            <span className="meta-label">Inicio</span>
+                            <span className="meta-value">{formatDate(selectedProject.start_date)}</span>
+                        </div>
+                    )}
+                    {selectedProject.end_date && (
+                        <div className="meta-item">
+                            <span className="meta-label">Fin</span>
+                            <span className="meta-value">{formatDate(selectedProject.end_date)}</span>
+                        </div>
+                    )}
                 </div>
-
-                {(selectedProject.start_date || selectedProject.end_date) && (
-                    <div className="detail-meta" style={{ marginTop: '-10px' }}>
-                        {selectedProject.start_date && (
-                            <div className="meta-item">
-                                <span className="meta-label">Inicio</span>
-                                <span className="meta-value">{formatDate(selectedProject.start_date)}</span>
-                            </div>
-                        )}
-                        {selectedProject.end_date && (
-                            <div className="meta-item">
-                                <span className="meta-label">Fin</span>
-                                <span className="meta-value">{formatDate(selectedProject.end_date)}</span>
-                            </div>
-                        )}
-                    </div>
-                )}
 
                 {selectedProject.adds && selectedProject.adds.length > 0 && (
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>

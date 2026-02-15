@@ -5,6 +5,7 @@ import { API_BASE_URL, API_V1_URL } from '../../config';
 import ProjectDetail from './ProjectDetail';
 import ApplicationModal from './ApplicationModal';
 import UpcomingReel from './UpcomingReel';
+import { validateProjectAction } from '../../validations/projectsValidation';
 
 const formatDate = (dateStr: string | undefined) => {
     if (!dateStr) return 'N/A';
@@ -45,8 +46,13 @@ const ProjectsSection = () => {
                     duracion: p.duration,
                     adds: Array.isArray(p.adds) ? p.adds : (typeof p.adds === 'string' ? JSON.parse(p.adds) : [])
                 }));
-                // Sort by featured first
-                const sorted = mapped.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
+                // Sort: start_date descending (newest first), then id descending
+                const sorted = mapped.sort((a: any, b: any) => {
+                    const dateA = a.start_date ? new Date(a.start_date).getTime() : 0;
+                    const dateB = b.start_date ? new Date(b.start_date).getTime() : 0;
+                    if (dateB !== dateA) return dateB - dateA;
+                    return b.id - a.id;
+                });
                 setProjects(sorted);
             }
         } catch (err) {
@@ -150,17 +156,13 @@ const ProjectsSection = () => {
                         <span className="current-label">Proyecto Actual</span>
                         <h2 className="current-title">{currentProject.title}</h2>
                         <p className="current-subtitle">{currentProject.subtitle}</p>
-                        <div className="detail-meta" style={{ marginBottom: 15 }}>
-                            <div className="meta-item">
-                                <span className="meta-label" style={{ color: '#000' }}>Estado:</span>
-                                <span className={getStatusClass(currentProject.status)}>{currentProject.status}</span>
-                            </div>
+                        <div className="banner-meta">
+                            <span className="meta-label" style={{ color: '#000' }}>Estado:</span>
+                            <span className={getStatusClass(currentProject.status)}>{currentProject.status}</span>
                         </div>
-                        <div className="detail-meta" style={{ marginBottom: 0 }}>
-                            <div className="meta-item">
-                                <span className="meta-label" style={{ color: '#000' }}>Cliente:</span>
-                                <span className="meta-value" style={{ color: '#000', fontWeight: 600 }}>{currentProject.cliente}</span>
-                            </div>
+                        <div className="banner-meta" style={{ marginBottom: 0 }}>
+                            <span className="meta-label" style={{ color: '#000' }}>Cliente:</span>
+                            <span className="meta-value" style={{ color: '#000', fontWeight: 600 }}>{currentProject.cliente}</span>
                         </div>
                     </div>
                     <div className="current-image-wrapper">
@@ -198,7 +200,11 @@ const ProjectsSection = () => {
                         getStatusClass={getStatusClass}
                         formatDate={formatDate}
                         hasAppliedTo={hasAppliedTo}
-                        onApplyClick={() => setIsApplying(true)}
+                        onApplyClick={() => {
+                            if (validateProjectAction(token)) {
+                                setIsApplying(true);
+                            }
+                        }}
                     />
                 )}
 

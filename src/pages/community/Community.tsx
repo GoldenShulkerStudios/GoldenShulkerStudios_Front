@@ -5,8 +5,9 @@ import PostCard from './PostCard';
 import PostModal from './PostModal';
 import Pagination from './Pagination';
 import { API_BASE_URL, API_V1_URL } from '../../config';
+import { validateCommunityAction } from '../../validations/communityValidation';
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 3;
 
 const Community = () => {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -99,7 +100,17 @@ const Community = () => {
         xhr.send(formData);
     };
 
+    const handleAddLink = () => {
+        if (!validateCommunityAction(token)) return;
+        const url = prompt('Introduce la URL del clip (YouTube, Twitch, etc.):');
+        if (url) {
+            setNewVideoUrl(url);
+            setNewImageUrl(''); // Priorizar video sobre imagen en previsualización
+        }
+    };
+
     const handleCreatePost = async () => {
+        if (!validateCommunityAction(token)) return;
         if (!newContent && !newImageUrl && !newVideoUrl) return;
         setLoading(true);
         try {
@@ -150,6 +161,11 @@ const Community = () => {
 
     return (
         <div className="community-container">
+            <header className="community-header fade-in">
+                <h1>MOMENTOS <span className="highlight">GOLDEN</span></h1>
+                <p>La red de comunicación oficial de Golden Shulker Studios. Comparte, comenta y vota lo mejor del servidor.</p>
+            </header>
+
             <div className="community-grid">
                 {/* Create Post Section */}
                 <div className="create-post-card">
@@ -160,7 +176,7 @@ const Community = () => {
                             </div>
                         )}
                         <textarea
-                            placeholder="¿Qué estás pensando?"
+                            placeholder="Comparte algo asombroso..."
                             value={newContent}
                             onChange={(e) => setNewContent(e.target.value)}
                         />
@@ -184,24 +200,24 @@ const Community = () => {
 
                     <div className="create-post-actions">
                         <div className="post-tool-buttons">
-                            <label className={`tool-btn ${isUploading ? 'disabled' : ''}`}>
+                            <label className={`tool-btn ${isUploading ? 'disabled' : ''}`} onClick={() => !validateCommunityAction(token)}>
                                 <Camera size={20} />
                                 <span>Foto</span>
-                                <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])} disabled={isUploading} hidden />
+                                <input type="file" accept="image/*" onChange={(e) => token && e.target.files?.[0] && handleUpload(e.target.files[0])} disabled={isUploading || !token} hidden />
                             </label>
-                            <label className={`tool-btn ${isUploading ? 'disabled' : ''}`}>
+                            <label className={`tool-btn ${isUploading ? 'disabled' : ''}`} onClick={() => !validateCommunityAction(token)}>
                                 <Film size={20} />
                                 <span>Subir Video</span>
-                                <input type="file" accept="video/*" onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])} disabled={isUploading} hidden />
+                                <input type="file" accept="video/*" onChange={(e) => token && e.target.files?.[0] && handleUpload(e.target.files[0])} disabled={isUploading || !token} hidden />
                             </label>
-                            <button className="tool-btn" disabled={isUploading}>
+                            <button className="tool-btn" onClick={handleAddLink} disabled={isUploading}>
                                 <ExternalLink size={20} />
                                 <span>Link Clip</span>
                             </button>
                         </div>
                         <button
                             className="publish-btn"
-                            disabled={loading || isUploading || (!newContent && !newImageUrl && !newVideoUrl)}
+                            disabled={loading || isUploading || (!!token && !newContent && !newImageUrl && !newVideoUrl)}
                             onClick={handleCreatePost}
                         >
                             Publicar
@@ -240,21 +256,23 @@ const Community = () => {
                             <Play size={20} />
                             <h3>Clips y Videos</h3>
                         </div>
-                        <div className="media-grid">
+                        <div className="posts-list">
                             {getPaginated(videoPosts, pages.videos).map(post => (
-                                <div key={post.id} className="media-item video" onClick={() => setSelectedPostId(post.id)}>
-                                    <video src={post.video_url?.startsWith('http') ? post.video_url : `${API_BASE_URL}${post.video_url}`} />
-                                    <div className="media-overlay">
-                                        <Play fill="white" size={30} />
-                                    </div>
-                                </div>
+                                <PostCard
+                                    key={post.id}
+                                    post={post}
+                                    user={user}
+                                    token={token}
+                                    onClick={() => setSelectedPostId(post.id)}
+                                    onRefresh={fetchPosts}
+                                />
                             ))}
+                            <Pagination
+                                current={pages.videos}
+                                total={totalPages(videoPosts)}
+                                onPageChange={(p) => setPages({ ...pages, videos: p })}
+                            />
                         </div>
-                        <Pagination
-                            current={pages.videos}
-                            total={totalPages(videoPosts)}
-                            onPageChange={(p) => setPages({ ...pages, videos: p })}
-                        />
                     </section>
 
                     <section className="feed-section">
@@ -262,18 +280,23 @@ const Community = () => {
                             <ImageIcon size={20} />
                             <h3>Fotos</h3>
                         </div>
-                        <div className="media-grid">
+                        <div className="posts-list">
                             {getPaginated(photoPosts, pages.photos).map(post => (
-                                <div key={post.id} className="media-item photo" onClick={() => setSelectedPostId(post.id)}>
-                                    <img src={post.image_url?.startsWith('http') ? post.image_url : `${API_BASE_URL}${post.image_url}`} alt="" />
-                                </div>
+                                <PostCard
+                                    key={post.id}
+                                    post={post}
+                                    user={user}
+                                    token={token}
+                                    onClick={() => setSelectedPostId(post.id)}
+                                    onRefresh={fetchPosts}
+                                />
                             ))}
+                            <Pagination
+                                current={pages.photos}
+                                total={totalPages(photoPosts)}
+                                onPageChange={(p) => setPages({ ...pages, photos: p })}
+                            />
                         </div>
-                        <Pagination
-                            current={pages.photos}
-                            total={totalPages(photoPosts)}
-                            onPageChange={(p) => setPages({ ...pages, photos: p })}
-                        />
                     </section>
                 </div>
             </div>
