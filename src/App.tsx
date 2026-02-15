@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-
 import Sidebar from './components/Sidebar';
 import TopNavbar from './components/TopNavbar';
 import ScrollToTop from './components/ScrollToTop';
-import LoadingScreen from './components/LoadingScreen';
 import Footer from './components/Footer';
+import LoadingScreen from './components/LoadingScreen';
+
 
 // Lazy load components
 const Login = lazy(() => import('./pages/Login'));
