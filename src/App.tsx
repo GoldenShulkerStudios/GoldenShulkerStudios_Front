@@ -2,7 +2,9 @@ import { useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import TopNavbar from './components/TopNavbar';
+import FloatingSupport from './components/FloatingSupport';
 import ScrollToTop from './components/ScrollToTop';
+
 import Footer from './components/Footer';
 import LoadingScreen from './components/LoadingScreen';
 
@@ -13,9 +15,7 @@ const Register = lazy(() => import('./pages/Register'));
 const Profile = lazy(() => import('./pages/profile/Profile'));
 
 // Admin Components
-const AdminInicio = lazy(() => import('./pages/admin/AdminInicio'));
-const AdminProyectos = lazy(() => import('./pages/admin/AdminProyectos'));
-const AdminNosotros = lazy(() => import('./pages/admin/AdminNosotros'));
+const AdminPanels = lazy(() => import('./pages/admin/AdminPanels'));
 const AdminConfig = lazy(() => import('./pages/admin/AdminConfig'));
 
 // Main Sections
@@ -24,24 +24,33 @@ const Services = lazy(() => import('./components/Services'));
 const ProjectsSection = lazy(() => import('./components/projects/ProjectsSection'));
 const AboutUs = lazy(() => import('./components/AboutUs'));
 const Community = lazy(() => import('./pages/community/Community'));
+const Support = lazy(() => import('./pages/support/Support'));
 
 
 const Layout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   return (
     <div className="app-container">
-      <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <Sidebar
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
+        isMobileOpen={isMobileOpen}
+        setIsMobileOpen={setIsMobileOpen}
+      />
       <main className={`main-content ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
-        <TopNavbar />
+        <TopNavbar onMenuClick={() => setIsMobileOpen(true)} />
         <Suspense fallback={<LoadingScreen />}>
           <Outlet />
         </Suspense>
+        <FloatingSupport />
         <Footer />
       </main>
     </div>
   );
 };
+
 
 // Create page wrappers to use lazy loaded components
 const HomePage = () => (
@@ -76,14 +85,13 @@ function App() {
             <Route path="proyectos" element={<ProyectosPage />} />
             <Route path="nosotros" element={<NosotrosPage />} />
             <Route path="comunidad" element={<Community />} />
+            <Route path="soporte" element={<Support />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="perfil" element={<Profile />} />
             <Route path="admin">
-              <Route path="inicio" element={<AdminInicio />} />
-              <Route path="proyectos" element={<AdminProyectos />} />
-              <Route path="nosotros" element={<AdminNosotros />} />
-              <Route path="configuracion" element={<AdminConfig />} />
+              <Route path="paneles" element={<AdminPanels />} />
+              <Route path="solicitudes" element={<AdminConfig />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

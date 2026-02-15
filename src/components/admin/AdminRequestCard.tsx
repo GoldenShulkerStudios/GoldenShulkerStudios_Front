@@ -11,7 +11,11 @@ interface AdminRequestCardProps {
     onAccept: () => void;
     onReject: () => void;
     onDelete?: () => void;
+    acceptLabel?: string;
+    rejectLabel?: string;
+    hasNotification?: boolean;
 }
+
 
 const AdminRequestCard: React.FC<AdminRequestCardProps> = ({
     title,
@@ -20,8 +24,12 @@ const AdminRequestCard: React.FC<AdminRequestCardProps> = ({
     details,
     onAccept,
     onReject,
-    onDelete
+    onDelete,
+    acceptLabel = "Aceptar",
+    rejectLabel = "Rechazar",
+    hasNotification = false
 }) => {
+
     return (
         <div style={{
             padding: '15px',
@@ -42,7 +50,17 @@ const AdminRequestCard: React.FC<AdminRequestCardProps> = ({
                     {subtitle && <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>{subtitle}</div>}
                 </div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    {hasNotification && (
+                        <span style={{
+                            width: '10px', height: '10px',
+                            background: 'var(--primary-yellow)',
+                            borderRadius: '50%',
+                            boxShadow: '0 0 8px var(--primary-yellow)',
+                            border: '1.5px solid #000'
+                        }}></span>
+                    )}
                     <StatusBadge status={status} />
+
                     {onDelete && (
                         <button
                             onClick={onDelete}
@@ -82,7 +100,7 @@ const AdminRequestCard: React.FC<AdminRequestCardProps> = ({
                         borderRadius: '6px'
                     }}
                 >
-                    Aceptar
+                    {acceptLabel}
                 </button>
                 <button
                     onClick={onReject}
@@ -98,11 +116,12 @@ const AdminRequestCard: React.FC<AdminRequestCardProps> = ({
                         borderRadius: '6px'
                     }}
                 >
-                    Rechazar
+                    {rejectLabel}
                 </button>
             </div>
         </div>
     );
 };
+
 
 export default AdminRequestCard;

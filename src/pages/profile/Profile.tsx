@@ -114,7 +114,9 @@ const Profile = () => {
             localStorage.setItem('dismissedNotifications', JSON.stringify(dismissedNotifs));
         }
         setNotifications(prev => prev.filter(n => n.id !== id));
+        window.dispatchEvent(new Event('profileUpdated'));
     };
+
 
     useEffect(() => {
         if (!token) {
@@ -201,15 +203,17 @@ const Profile = () => {
                             {hasNotif && (
                                 <span style={{
                                     position: 'absolute',
-                                    top: '-5px',
-                                    right: '-5px',
+                                    top: '-4px',
+                                    right: '-4px',
                                     width: '10px',
                                     height: '10px',
                                     background: 'var(--primary-yellow)',
                                     borderRadius: '50%',
-                                    boxShadow: '0 0 10px var(--primary-yellow)'
+                                    boxShadow: '0 0 8px var(--primary-yellow)',
+                                    border: '1.5px solid #000'
                                 }}></span>
                             )}
+
                         </button>
                     );
                 })}

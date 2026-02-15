@@ -42,9 +42,30 @@ const Register = () => {
                 throw new Error(data.detail || 'Error al registrarse');
             }
 
-            // After successful registration, redirect to login
-            navigate('/login');
+            // After successful registration, log in automatically
+            const formData = new URLSearchParams();
+            formData.append('username', email);
+            formData.append('password', password);
+
+            const loginResponse = await fetch(`${API_V1_URL}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData,
+            });
+
+            if (loginResponse.ok) {
+                const loginData = await loginResponse.json();
+                localStorage.setItem('token', loginData.access_token);
+                window.dispatchEvent(new Event('authChange'));
+                navigate('/');
+            } else {
+                // If auto-login fails for some reason, redirect to login page as fallback
+                navigate('/login');
+            }
         } catch (err: any) {
+
             setError(err.message);
         } finally {
             setLoading(false);

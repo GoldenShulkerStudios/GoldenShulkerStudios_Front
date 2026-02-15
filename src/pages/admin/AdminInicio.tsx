@@ -121,16 +121,16 @@ const AdminInicio = () => {
 
     return (
         <div className="fade-in" style={{ padding: '40px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                    <h2 style={{ color: 'var(--primary-yellow)', fontSize: '2.5rem' }}>Editar Panel: Inicio (Banners)</h2>
-                    <p style={{ opacity: 0.6 }}>Máximo 4 banners permitidos. Arrastra para reordenar.</p>
-                </div>
+            <div className="admin-header-actions">
                 {banners.length < 4 && (
                     <button className="admin-btn admin-btn-add" onClick={() => setIsEditing({})}>
                         <Plus size={20} /> Nuevo Banner
                     </button>
                 )}
+            </div>
+            <div style={{ display: 'none' }}>
+                <h2 style={{ color: 'var(--primary-yellow)', fontSize: '2.5rem' }}>Editar Panel: Inicio (Banners)</h2>
+                <p style={{ opacity: 0.6 }}>Máximo 4 banners permitidos. Arrastra para reordenar.</p>
             </div>
 
             <div className="admin-table-container">

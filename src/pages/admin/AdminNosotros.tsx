@@ -88,11 +88,13 @@ const AdminNosotros = () => {
 
     return (
         <div className="fade-in" style={{ padding: '40px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ color: 'var(--primary-yellow)', fontSize: '2.5rem' }}>Miembros del Equipo</h2>
+            <div className="admin-header-actions">
                 <button className="admin-btn admin-btn-add" onClick={() => setIsEditing({})}>
                     <Plus size={20} /> Nuevo Miembro
                 </button>
+            </div>
+            <div style={{ display: 'none' }}>
+                <h2 style={{ color: 'var(--primary-yellow)', fontSize: '2.5rem' }}>Miembros del Equipo</h2>
             </div>
 
             <div className="admin-table-container">
